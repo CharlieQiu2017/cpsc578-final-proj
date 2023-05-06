@@ -72,3 +72,7 @@ This skeleton project was adapted from [edwinwebb's ThreeJS seed project](https:
 
 ## License
 [MIT](./LICENSE)
+
+## Note
+
+Had to run `npm install --legacy-peer-deps three` to get the app to compile.
