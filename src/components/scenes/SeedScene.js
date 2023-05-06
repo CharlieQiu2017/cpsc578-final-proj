@@ -1,10 +1,11 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color } from 'three';
+import { Scene, Color, Vector3 } from 'three';
 import * as CANNON from 'cannon-es';
 import { Stick } from 'objects';
 import { BasicLights } from 'lights';
 import Cube from '../objects/Cube/Cube';
 import Ground from '../objects/Ground/Ground';
+import Sphere from '../objects/Sphere/Sphere';
 
 
 class SeedScene extends Scene {
@@ -15,11 +16,27 @@ class SeedScene extends Scene {
         // Init state
         this.state = {
             gui: new Dat.GUI(), // Create GUI for scene
-            rotationSpeed: 1,
+            rotationSpeed: -5,
             updateList: [],
             leftPressed: false,
-            rightPressed: false
+            rightPressed: false,
+            upPressed: false,
+            downPressed: false,
+            isPaused: true,
+            Score: 0
         };
+
+        // Configure GUI
+        const buttons = ["Start", "Pause", "Reset"];
+        const apiMenu = {
+            Start: () => {this.state.isPaused = false;},
+            Pause: () => {this.state.isPaused = true;},
+            Reset: () => {this.resetScene()}
+        };
+        const menu = this.state.gui.addFolder("Menu");
+        buttons.forEach((button) => menu.add(apiMenu, button));
+        menu.open();
+        this.state.gui.add(this.state, 'Score');
 
         // Set background to a nice color
         this.background = new Color(0x7ec0ee);
@@ -51,13 +68,23 @@ class SeedScene extends Scene {
         this.add(this.cube);
         this.world.addBody(this.cube.body);
 
+        // Test sphere
+        this.sphere = new Sphere();
+        this.add(this.sphere);
+        this.world.addBody(this.sphere.body);
+
         // Add ground
         this.ground = new Ground(groundMaterial);
         this.add(this.ground);
         this.world.addBody(this.ground.body);
 
-        // Populate GUI
-        this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
+        // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
+    }
+
+    resetScene() {
+        this.cube.setPosition(new Vector3(1, 15, 0));
+        this.stick.setPosition(new Vector3(0, 10, 0));
+        this.sphere.setPosition(new Vector3(-2, 20, 0))
     }
 
     addToUpdateList(object) {
@@ -65,21 +92,49 @@ class SeedScene extends Scene {
     }
 
     update(timeStamp) {
-        const { rotationSpeed, updateList } = this.state;
-        this.rotation.y = (rotationSpeed * timeStamp) / 10000;
+        // const { rotationSpeed, updateList } = this.state;
+        // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
+
+        for (var i in this.state.gui.__controllers) {
+            this.state.gui.__controllers[i].updateDisplay();
+        }
+
+        // Skip the rest if the game is paused
+        if (this.state.isPaused) return;
 
         // Physics
         this.world.fixedStep();
         this.cube.updatePosition();
         this.stick.updatePosition();
+        this.sphere.updatePosition();
 
         // Move stick figure
+        const movementInc = 0.5;
+
+        // Left and right movement
         if (this.state.leftPressed) {
-            this.stick.body.velocity.x = -10;
+            this.stick.body.velocity.x -= movementInc;
         } else if (this.state.rightPressed) {
-            this.stick.body.velocity.x = 10;
-        } else {
+            this.stick.body.velocity.x += movementInc;
+        } else if (Math.abs(this.stick.body.velocity.x) < movementInc) {
             this.stick.body.velocity.x = 0;
+        } else if (this.stick.body.velocity.x > 0) {
+            this.stick.body.velocity.x -= movementInc;
+        } else {
+            this.stick.body.velocity.x += movementInc
+        }
+
+        // Up and down movement
+        if (this.state.upPressed) {
+            this.stick.body.velocity.z -= movementInc;
+        } else if (this.state.downPressed) {
+            this.stick.body.velocity.z += movementInc;
+        } else if (Math.abs(this.stick.body.velocity.z) < movementInc) {
+            this.stick.body.velocity.z = 0;
+        } else if (this.stick.body.velocity.z > 0) {
+            this.stick.body.velocity.z -= movementInc;
+        } else {
+            this.stick.body.velocity.z += movementInc
         }
     }
 }

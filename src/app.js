@@ -16,7 +16,7 @@ const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer({ antialias: true });
 
 // Set up camera
-camera.position.set(6, 3, -10);
+camera.position.set(0, 30, 50);
 camera.lookAt(new Vector3(0, 0, 0));
 
 // Set up renderer, canvas, and minor CSS adjustments
@@ -30,7 +30,7 @@ document.body.appendChild(canvas);
 // Set up controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-controls.enablePan = false;
+controls.enablePan = true;
 controls.minDistance = 4;
 controls.maxDistance = 50;
 controls.update();
@@ -56,18 +56,28 @@ window.addEventListener('resize', windowResizeHandler, false);
 
 window.addEventListener("keydown", event => {
     if (event.key == "ArrowLeft") {
-	scene.state.leftPressed = true;
-	scene.state.rightPressed = false;
+        scene.state.leftPressed = true;
+        scene.state.rightPressed = false;
     } else if (event.key == "ArrowRight") {
-	scene.state.rightPressed = true;
-	scene.state.leftPressed = false;
+        scene.state.rightPressed = true;
+        scene.state.leftPressed = false;
+    } else if (event.key == "ArrowUp") {
+        scene.state.upPressed = true;
+        scene.state.downPressed = false;
+    } else if (event.key == "ArrowDown") {
+        scene.state.downPressed = true;
+        scene.state.upPressed = false;
     }
 });
 
 window.addEventListener("keyup", event => {
     if (event.key == "ArrowLeft") {
-	scene.state.leftPressed = false;
+	    scene.state.leftPressed = false;
     } else if (event.key == "ArrowRight") {
-	scene.state.rightPressed = false;
+	    scene.state.rightPressed = false;
+    } else if (event.key == "ArrowUp") {
+        scene.state.upPressed = false;
+    } else if (event.key == "ArrowDown") {
+        scene.state.downPressed = false;
     }
 });
