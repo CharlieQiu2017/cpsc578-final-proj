@@ -64,8 +64,14 @@ class SeedScene extends Scene {
         this.world.addBody(this.stick.body);
 
         // Test cube
+        // this.shown = false;
         this.cube = new Cube();
         this.add(this.cube);
+        this.cube.body.addEventListener("collide", (e) => {
+            if (this.stick.body === e.body || this.stick.body === e.target) {
+                this.state.Score += 1;
+            }
+        });
         this.world.addBody(this.cube.body);
 
         // Test sphere
