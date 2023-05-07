@@ -14,8 +14,9 @@ class Cube extends THREE.Mesh {
         this.name = 'cube';
 
         // Default position for the cube
-        this.position.x = 1
+        this.position.x = 4
         this.position.y = 15
+        this.position.z = 5
 
         // Define the shape and physical properties of the cube
         const cubeShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
