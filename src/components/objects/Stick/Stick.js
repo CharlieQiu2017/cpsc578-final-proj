@@ -8,7 +8,7 @@ class Stick extends Mesh {
     /**
      * Constructor for Stick object with position and material arguments
      * */
-    constructor(material = undefined, pos = new Vector3(0, 10, 5)) {
+    constructor(material = undefined, pos = new Vector3(0, 0, 5)) {
         // Call parent Mesh() constructor
         super();
 

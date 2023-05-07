@@ -5,7 +5,7 @@ class Ground extends THREE.Mesh {
     constructor(material = undefined) {
 
         // Sphere material and geometry
-        const planeGeometry = new THREE.PlaneGeometry(60, 40);
+        const planeGeometry = new THREE.PlaneGeometry(120, 40);
         const normalMaterial = new THREE.MeshNormalMaterial();
         const phongMaterial = new THREE.MeshPhongMaterial({
             color: 0x3E3117, //soil: https://www.color-hex.com/color-palette/15769
@@ -20,7 +20,7 @@ class Ground extends THREE.Mesh {
         // Default position and orientation for the plane
         this.rotateX(-Math.PI / 2);
         this.position.x = 0;
-        this.position.y = 0;
+        this.position.y = -10;
 
         // Define the shape and physical properties of the plane
         const planeShape = new CANNON.Plane()
