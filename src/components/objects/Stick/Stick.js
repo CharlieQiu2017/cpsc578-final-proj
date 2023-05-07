@@ -20,7 +20,6 @@ class Stick extends Mesh {
 
         loader.load(MODEL, (gltf) => {
             this.model = gltf.scene.children[0];
-            console.log(this.model.geometry);
             this.model.scale.set(1, 1, 1);
             this.add(this.model);
         });
