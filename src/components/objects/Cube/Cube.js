@@ -6,7 +6,7 @@ class Cube extends THREE.Mesh {
 
         // Cube material and geometry
         const normalMaterial = new THREE.MeshNormalMaterial();
-        const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+        const cubeGeometry = new THREE.BoxGeometry(4, 4, 4);
 
         // Call parent Mesh() constructor
         super(cubeGeometry, normalMaterial);
@@ -17,7 +17,7 @@ class Cube extends THREE.Mesh {
         this.position.copy(pos);
 
         // Define the shape and physical properties of the cube
-        const cubeShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5));
+        const cubeShape = new CANNON.Box(new CANNON.Vec3(2, 2, 2));
         this.body = new CANNON.Body({ mass: 1 });
         this.body.addShape(cubeShape);
 

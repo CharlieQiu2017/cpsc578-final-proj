@@ -1,5 +1,5 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, Vector3 } from 'three';
+import { Scene, Color, Vector3, MeshPhongMaterial, PlaneGeometry, Mesh } from 'three';
 import * as CANNON from 'cannon-es';
 import { Stick } from 'objects';
 import { BasicLights } from 'lights';
@@ -18,10 +18,10 @@ class SeedScene extends Scene {
 
         // Values for random generation
         this.playableArea = {
-            minX: -25,
-            maxX: 25,
-            minZ: -25,
-            maxZ: 25, 
+            minX: -20,
+            maxX: 20,
+            minZ: -20,
+            maxZ: 20, 
         }
         this.generateHeight = 15;
         this.lastGenerateTime = 0;
@@ -30,11 +30,12 @@ class SeedScene extends Scene {
 
         // Collision timings
         this.destructionDelay = 3000; // How long before object disappears after hitting ground
-        this.invulnerableDelay = 2000; // How long the player remains invulnerable
+        this.invulnerableDelay = 500; // How long the player remains invulnerable
                                         // after being hit with an object
         this.lastStickCollisionTime = 0;
 
         // Init state
+        this.defaultLives = 5;
         this.state = {
             gui: new Dat.GUI(), // Create GUI for scene
             rotationSpeed: 0,
@@ -44,7 +45,8 @@ class SeedScene extends Scene {
             upPressed: false,
             downPressed: false,
             isPaused: true,
-            Score: 0
+            Score: 0,
+            Lives: this.defaultLives
         };
 
         // Configure GUI
@@ -58,6 +60,7 @@ class SeedScene extends Scene {
         buttons.forEach((button) => menu.add(apiMenu, button));
         menu.open();
         this.state.gui.add(this.state, 'Score');
+        this.state.gui.add(this.state, 'Lives');
 
         // Set background to a nice color
         this.background = new Color(0x7ec0ee);
@@ -84,26 +87,24 @@ class SeedScene extends Scene {
         this.add(this.stick);
         this.world.addBody(this.stick.body);
 
-        // Test cube
-        // this.shown = false;
-        // this.cube = new Cube();
-        // this.add(this.cube);
-        // this.cube.body.addEventListener("collide", (e) => {
-        //     if (this.stick.body === e.body) {
-        //         this.state.Score += 1;
-        //     }
-        // });
-        // this.world.addBody(this.cube.body);
-
-        // Test sphere
-        // this.sphere = new Sphere();
-        // this.add(this.sphere);
-        // this.world.addBody(this.sphere.body);
-
         // Add ground
         this.ground = new Ground(groundMaterial);
         this.add(this.ground);
         this.world.addBody(this.ground.body);
+
+        // Add world boundaries
+        const boundaryAngles = [Math.PI / 2, -Math.PI / 2, 0, Math.PI];
+        const boundaryDist = [
+            new Vector3(this.playableArea.minX, 0, 0), new Vector3(this.playableArea.maxX, 0, 0),
+            new Vector3(0, 0, this.playableArea.minZ), new Vector3(0, 0, this.playableArea.maxZ)];
+        for (let i = 0; i < boundaryAngles.length; i++) {
+            const planeShape = new CANNON.Plane();
+            const planeBody = new CANNON.Body({ mass: 0, material: groundMaterial});
+            planeBody.addShape(planeShape);
+            planeBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), boundaryAngles[i]);
+            planeBody.position.copy(boundaryDist[i]);
+            this.world.addBody(planeBody);
+        }
 
         // Add background
         this.background = new Rectangle();
@@ -129,7 +130,7 @@ class SeedScene extends Scene {
             // If collision is with player
             if (collisionEvent.body === this.stick.body) {
                 if (this.currentTime - this.lastStickCollisionTime >= this.invulnerableDelay) {
-                    console.log("ouch");
+                    this.state.Lives -= 1;
                     this.lastStickCollisionTime = this.currentTime;
                 }
             }
@@ -137,6 +138,7 @@ class SeedScene extends Scene {
             // If collision is with ground
             if (collisionEvent.body === this.ground.body) {
                 if (!collisionEvent.target.hasCollidedWithGround) {
+                    this.state.Score += 1;
                     collisionEvent.target.hasCollidedWithGround = true;
                     collisionEvent.target.destructionTime = this.currentTime + this.destructionDelay;
                 }
@@ -174,6 +176,10 @@ class SeedScene extends Scene {
 
         // Reset stick figure
         this.stick.setPosition(new Vector3(0, 10, 0));
+
+        // Reset score and lives
+        this.state.Score = 0;
+        this.state.Lives = this.defaultLives;
     }
 
     addToUpdateList(object) {
@@ -190,6 +196,9 @@ class SeedScene extends Scene {
         for (var i in this.state.gui.__controllers) {
             this.state.gui.__controllers[i].updateDisplay();
         }
+
+        // Pause the game if out of lives
+        if (this.state.Lives <= 0) this.state.isPaused = true;
 
         // Skip the rest if the game is paused
         if (this.state.isPaused) return;

@@ -5,7 +5,7 @@ class Ground extends THREE.Mesh {
     constructor(material = undefined) {
 
         // Sphere material and geometry
-        const planeGeometry = new THREE.PlaneGeometry(120, 40);
+        const planeGeometry = new THREE.PlaneGeometry(40, 40);
         const normalMaterial = new THREE.MeshNormalMaterial();
         const phongMaterial = new THREE.MeshPhongMaterial({
             color: 0x3E3117, //soil: https://www.color-hex.com/color-palette/15769
