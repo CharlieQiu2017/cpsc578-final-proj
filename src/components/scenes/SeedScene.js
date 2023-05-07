@@ -6,6 +6,7 @@ import { BasicLights } from 'lights';
 import Cube from '../objects/Cube/Cube';
 import Ground from '../objects/Ground/Ground';
 import Sphere from '../objects/Sphere/Sphere';
+import Rectangle from '../objects/Background/Rectangle';
 
 
 class SeedScene extends Scene {
@@ -36,7 +37,7 @@ class SeedScene extends Scene {
         // Init state
         this.state = {
             gui: new Dat.GUI(), // Create GUI for scene
-            rotationSpeed: -5,
+            rotationSpeed: 0,
             updateList: [],
             leftPressed: false,
             rightPressed: false,
@@ -103,6 +104,10 @@ class SeedScene extends Scene {
         this.ground = new Ground(groundMaterial);
         this.add(this.ground);
         this.world.addBody(this.ground.body);
+
+        // Add background
+        this.background = new Rectangle();
+        this.add(this.background);
 
         // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
     }

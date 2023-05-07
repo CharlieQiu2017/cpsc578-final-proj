@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 
 class Cube extends THREE.Mesh {
-    constructor(material = undefined, pos = new THREE.Vector3(1, 15, 0)) {
+    constructor(material = undefined, pos = new THREE.Vector3(4, 15, 5)) {
 
         // Cube material and geometry
         const normalMaterial = new THREE.MeshNormalMaterial();
