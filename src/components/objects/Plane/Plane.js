@@ -7,22 +7,24 @@ class Plane extends THREE.Mesh {
         // Sphere material and geometry
         const planeGeometry = new THREE.PlaneGeometry(width, height);
 
-        // const loader = new THREE.TextureLoader();
-        // loader.load('../Plane/rockysoil.jpg', (texture) => {
-        //     texture.wrapS = THREE.RepeatWrapping;
-        //     texture.wrapT = THREE.RepeatWrapping;
-        //     const material = new THREE.MeshBasicMaterial({
-        //       map: texture,
-        //     });
-        // });
-
-        const phongMaterial = new THREE.MeshPhongMaterial({
-            color: color, //soil: https://www.color-hex.com/color-palette/15769
-            flatShading: true,
+        const loader = new THREE.TextureLoader();
+        let material;
+        loader.load('src/components/objects/Plane/rockysoil.jpg', (texture) => {
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            material = new THREE.MeshBasicMaterial({
+              map: texture,
+            });
         });
-
         // Call parent Mesh() constructor
-        super(planeGeometry, phongMaterial);
+        super(planeGeometry, material);
+
+        // const phongMaterial = new THREE.MeshPhongMaterial({
+        //     color: color, //soil: https://www.color-hex.com/color-palette/15769
+        //     flatShading: true,
+        // });
+        // // Call parent Mesh() constructor
+        // super(planeGeometry, phongMaterial);
 
         this.name = 'plane';
 
