@@ -14,6 +14,7 @@ import { SeedScene } from 'scenes';
 const scene = new SeedScene();
 const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer({ antialias: true });
+renderer.shadowMap.enabled = true;
 
 // Set up camera
 // camera.position.set(0, 30, 50);

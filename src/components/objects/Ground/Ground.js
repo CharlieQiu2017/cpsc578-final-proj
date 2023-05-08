@@ -33,6 +33,9 @@ class Ground extends THREE.Mesh {
         this.body.position.x = this.position.x;
         this.body.position.y = this.position.y;
         this.body.position.z = this.position.z;
+
+        // Show shadows cast onto ground
+        this.receiveShadow = true;
     }
     
     /**

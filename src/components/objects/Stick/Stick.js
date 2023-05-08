@@ -26,7 +26,7 @@ class Stick extends Mesh {
 
         // Define simple physics model for the stick figure
         this.body = new CANNON.Body({
-            mass: 1,
+            mass: 10**5,
             shape: new CANNON.Box(new CANNON.Vec3(0.5, 2.5, 0.5)),
             velocity: new CANNON.Vec3(0, 0, 0),
             material: material

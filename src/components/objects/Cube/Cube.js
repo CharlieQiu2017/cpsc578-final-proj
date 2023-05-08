@@ -26,6 +26,9 @@ class Cube extends THREE.Mesh {
         this.body.position.x = this.position.x;
         this.body.position.y = this.position.y;
         this.body.position.z = this.position.z;
+
+        // Make cube cast shadow
+        this.castShadow = true;
     }
     
     /**
