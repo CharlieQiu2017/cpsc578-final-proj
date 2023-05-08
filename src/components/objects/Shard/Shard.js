@@ -3,14 +3,18 @@ import * as CANNON from 'cannon-es';
 
 
 class Shard extends THREE.Mesh {
-    constructor(material = undefined, verts, index, pos, v0) {
+    constructor(material = undefined, verts, faces, v0) {
+
+        // Get shard verts for THREE.js mesh
+        var shardVerts = [];
+        verts.forEach((vert) => {shardVerts.push([vert.x, vert.y, vert.z])});
+        shardVerts = shardVerts.flat();
 
         // Sphere material and geometry
-        // const normalMaterial = new THREE.MeshNormalMaterial();
         const normalMaterial = new THREE.MeshNormalMaterial();
         const bufferGeometry = new THREE.BufferGeometry();
-        bufferGeometry.setAttribute("position", new THREE.BufferAttribute( verts, 3 ));
-        bufferGeometry.setIndex(index);
+        bufferGeometry.setAttribute("position", new THREE.BufferAttribute( new Float32Array(shardVerts), 3 ));
+        bufferGeometry.setIndex(faces.flat());
         bufferGeometry.computeVertexNormals();
 
         // Call parent Mesh() constructor
@@ -18,35 +22,11 @@ class Shard extends THREE.Mesh {
 
         this.name = 'shard';
 
-        // Default position for the sphere
-        // this.position.copy(pos)
-
-        // Define the shape and physical properties of the sphere
-        const index2 = [];
-        const verts2 = [];
-        for (var i = 0; i < 4; i ++) {
-            index2.push([index[3 * i], index[3 * i + 1], index[3 * i + 2]]);
-            verts2.push(new CANNON.Vec3(verts[3 * i] + pos.x, verts[3 * i + 1] + pos.y, verts[3 * i + 2] + pos.z));
-        };
-
-
-        const shardShape = new CANNON.ConvexPolyhedron(verts2, index2);
-        this.body = new CANNON.Body({ mass: 1 });
+        const shardShape = new CANNON.Trimesh(shardVerts, faces.flat());
+        this.body = new CANNON.Body({ mass: 1/12 });
         this.body.addShape(shardShape);
-        this.body.velocity = v0;
-        shardShape.vertices = verts2;
-
-        // console.log(this.body.position);
-        // Update the position of the physical shape to be the same as
-        // that of the mesh
-        var centroid = new CANNON.Vec3(0.0, 0.0, 0.0);
-        centroid = centroid.vadd(verts2[0]);
-        centroid = centroid.vadd(verts2[1]);
-        centroid = centroid.vadd(verts2[2]);
-        centroid = centroid.vadd(verts2[3]);
-        centroid = centroid.scale(1/ 4);
-        this.body.position.copy(centroid);
-        // console.log(this.body.position);
+        this.body.velocity = new CANNON.Vec3(v0.x * 5, v0.y * 5, v0.z * 5);
+        this.body.position.copy(this.position);
     }
     
     /**
