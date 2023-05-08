@@ -1,5 +1,5 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, Vector3, MeshPhongMaterial, PlaneGeometry, Mesh } from 'three';
+import { Scene, Color, Vector3, MeshPhongMaterial, PlaneGeometry, Mesh, Fog } from 'three';
 import * as CANNON from 'cannon-es';
 import { Stick } from 'objects';
 import { BasicLights } from 'lights';
@@ -7,6 +7,7 @@ import Cube from '../objects/Cube/Cube';
 import Ground from '../objects/Ground/Ground';
 import Sphere from '../objects/Sphere/Sphere';
 import Rectangle from '../objects/Background/Rectangle';
+import Plane from '../objects/Plane/Plane';
 
 
 class SeedScene extends Scene {
@@ -63,7 +64,7 @@ class SeedScene extends Scene {
         this.state.gui.add(this.state, 'Lives');
 
         // Set background to a nice color
-        this.background = new Color(0x7ec0ee);
+        this.background = new Color(0x7ec0ee); //sky = 0x87CEEB
 
         // Initialize the world for the physics engine
         this.world = new CANNON.World({
@@ -87,10 +88,20 @@ class SeedScene extends Scene {
         this.add(this.stick);
         this.world.addBody(this.stick.body);
 
+        // Add plane under ground
+        this.underground = new Plane();
+        this.add(this.underground);
+        
         // Add ground
         this.ground = new Ground(groundMaterial);
         this.add(this.ground);
         this.world.addBody(this.ground.body);
+
+        // fog
+        const color = 0x2F4F4F;  // white
+        const near = 0;
+        const far = 200;
+        this.fog = new Fog(color, near, far);
 
         // Add world boundaries
         const boundaryAngles = [Math.PI / 2, -Math.PI / 2, 0, Math.PI];
@@ -119,7 +130,7 @@ class SeedScene extends Scene {
             Math.random() * (this.playableArea.maxX - this.playableArea.minX) + this.playableArea.minX,
             this.generateHeight,
             Math.random() * (this.playableArea.maxZ - this.playableArea.minZ) + this.playableArea.minZ
-        ), 3 + Math.random ());
+        ), 3 + Math.random(), Math.random() * 20, Math.random() * 30);
 
         // Add some extra properties for the object
         newCube.body.hasCollidedWithGround = false;
