@@ -6,10 +6,10 @@ class Rectangle extends THREE.Mesh {
 
         // Cube material and geometry
         const phongMaterial = new THREE.MeshPhongMaterial({
-            color: 0xB7410E,
+            color: 0xB7410E, //0xC08955,
             flatShading: true,
         });
-        const rectangleGeometry = new THREE.BoxGeometry(150, 50, 10, 15, 5, 5);
+        const rectangleGeometry = new THREE.BoxGeometry(200, 80, 10, 20, 10, 5);
         rectangleGeometry.mergeVertices();
 
         var randomFloorVertexPos;
@@ -18,8 +18,11 @@ class Rectangle extends THREE.Mesh {
             randomFloorVertexPos = Math.floor(Math.random() * ((0) - 
             (-90)) + (-90));
 
-            floorVertex.z = randomFloorVertexPos;
-            rectangleGeometry.verticesNeedUpdate = true;
+            // if (floorVertex.y > -16 && floorVertex.y < 16) {
+                floorVertex.z = randomFloorVertexPos;
+                rectangleGeometry.verticesNeedUpdate = true;
+            // }
+
         });
 
         // Call parent Mesh() constructor
@@ -32,7 +35,7 @@ class Rectangle extends THREE.Mesh {
         // Default position for the cube
         this.position.x = 0
         this.position.y = 7
-        this.position.z = -15
+        this.position.z = -25
     }
     
     /**

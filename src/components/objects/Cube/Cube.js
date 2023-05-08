@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 
 class Cube extends THREE.Mesh {
-    constructor(material = undefined, pos = new THREE.Vector3(4, 15, 5), size = 4) {
+    constructor(material = undefined, pos = new THREE.Vector3(4, 15, 5), size = 4, mass = 1, yvelocity = 0) {
 
         // Cube material and geometry
         const normalMaterial = new THREE.MeshNormalMaterial();
@@ -18,7 +18,8 @@ class Cube extends THREE.Mesh {
 
         // Define the shape and physical properties of the cube
         const cubeShape = new CANNON.Box(new CANNON.Vec3(size / 2, size / 2, size / 2));
-        this.body = new CANNON.Body({ mass: 1 });
+        this.body = new CANNON.Body({ mass: mass });
+        this.body.velocity.y += yvelocity;
         this.body.addShape(cubeShape);
 
         // Update the position of the physical shape to be the same as

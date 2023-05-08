@@ -8,7 +8,7 @@ class Ground extends THREE.Mesh {
         const planeGeometry = new THREE.PlaneGeometry(40, 40);
         const normalMaterial = new THREE.MeshNormalMaterial();
         const phongMaterial = new THREE.MeshPhongMaterial({
-            color: 0x3E3117, //soil: https://www.color-hex.com/color-palette/15769
+            color: 0x060F01, //0x3E3117, //soil: https://www.color-hex.com/color-palette/15769
             flatShading: true,
         });
 
