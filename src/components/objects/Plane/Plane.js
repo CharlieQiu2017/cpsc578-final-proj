@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
+import texture from './rockysoil.jpg';
 
 class Plane extends THREE.Mesh {
     constructor(width = 140, height = 70, color = 0x1B1915/*0x060F01*/) {
@@ -7,18 +8,19 @@ class Plane extends THREE.Mesh {
         // Sphere material and geometry
         const planeGeometry = new THREE.PlaneGeometry(width, height);
 
-        // const loader = new THREE.TextureLoader();
-        // loader.load('../Plane/rockysoil.jpg', (texture) => {
-        //     texture.wrapS = THREE.RepeatWrapping;
-        //     texture.wrapT = THREE.RepeatWrapping;
-        //     const material = new THREE.MeshBasicMaterial({
-        //       map: texture,
-        //     });
-        // });
+        const loader = new THREE.TextureLoader();
+        const meshTexture = loader.load(texture, (texture) => {
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            // const material = new THREE.MeshBasicMaterial({
+            //   map: texture,
+            // });
+        });
 
         const phongMaterial = new THREE.MeshPhongMaterial({
             color: color, //soil: https://www.color-hex.com/color-palette/15769
             flatShading: true,
+            map: meshTexture
         });
 
         // Call parent Mesh() constructor
