@@ -20,7 +20,6 @@ class Stick extends Mesh {
 
         loader.load(MODEL, (gltf) => {
             this.model = gltf.scene.children[0];
-            console.log(this.model.geometry);
             this.model.scale.set(1, 1, 1);
             this.add(this.model);
         });
@@ -29,7 +28,7 @@ class Stick extends Mesh {
         this.body = new CANNON.Body({
             mass: 1,
             shape: new CANNON.Box(new CANNON.Vec3(0.5, 2.5, 0.5)),
-            velocity: new CANNON.Vec3(10, 0, 0),
+            velocity: new CANNON.Vec3(0, 0, 0),
             material: material
         })
         this.position.copy(pos);
