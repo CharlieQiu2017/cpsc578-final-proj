@@ -1,5 +1,5 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, Vector3, MeshPhongMaterial, PlaneGeometry, Mesh } from 'three';
+import { Scene, Color, Vector3, MeshPhongMaterial, PlaneGeometry, Mesh, Fog } from 'three';
 import * as CANNON from 'cannon-es';
 import { Stick } from 'objects';
 import { BasicLights } from 'lights';
@@ -97,6 +97,11 @@ class SeedScene extends Scene {
         this.add(this.ground);
         this.world.addBody(this.ground.body);
 
+        // fog
+        const color = 0x2F4F4F;  // white
+        const near = 0;
+        const far = 200;
+        this.fog = new Fog(color, near, far);
 
         // Add world boundaries
         const boundaryAngles = [Math.PI / 2, -Math.PI / 2, 0, Math.PI];
