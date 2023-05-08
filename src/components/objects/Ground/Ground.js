@@ -10,6 +10,8 @@ class Ground extends THREE.Mesh {
         const phongMaterial = new THREE.MeshPhongMaterial({
             color: 0x060F01, //0x3E3117, //soil: https://www.color-hex.com/color-palette/15769
             flatShading: true,
+            transparent: true,
+            opacity: 0.0
         });
 
         // Call parent Mesh() constructor
