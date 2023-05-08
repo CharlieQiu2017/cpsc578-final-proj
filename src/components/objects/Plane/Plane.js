@@ -22,9 +22,15 @@ class Plane extends THREE.Mesh {
             flatShading: true,
             map: meshTexture
         });
-
         // Call parent Mesh() constructor
         super(planeGeometry, phongMaterial);
+
+        // const phongMaterial = new THREE.MeshPhongMaterial({
+        //     color: color, //soil: https://www.color-hex.com/color-palette/15769
+        //     flatShading: true,
+        // });
+        // // Call parent Mesh() constructor
+        // super(planeGeometry, phongMaterial);
 
         this.name = 'plane';
 
