@@ -39,7 +39,13 @@ class Shard extends THREE.Mesh {
         // console.log(this.body.position);
         // Update the position of the physical shape to be the same as
         // that of the mesh
-        this.body.position.copy(pos);
+        var centroid = new CANNON.Vec3(0.0, 0.0, 0.0);
+        centroid = centroid.vadd(verts2[0]);
+        centroid = centroid.vadd(verts2[1]);
+        centroid = centroid.vadd(verts2[2]);
+        centroid = centroid.vadd(verts2[3]);
+        centroid = centroid.scale(1/ 4);
+        this.body.position.copy(centroid);
         // console.log(this.body.position);
     }
     
