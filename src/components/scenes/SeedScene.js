@@ -119,7 +119,7 @@ class SeedScene extends Scene {
             Math.random() * (this.playableArea.maxX - this.playableArea.minX) + this.playableArea.minX,
             this.generateHeight,
             Math.random() * (this.playableArea.maxZ - this.playableArea.minZ) + this.playableArea.minZ
-        ));
+        ), 3 + Math.random ());
 
         // Add some extra properties for the object
         newCube.body.hasCollidedWithGround = false;
@@ -132,6 +132,21 @@ class SeedScene extends Scene {
                 if (this.currentTime - this.lastStickCollisionTime >= this.invulnerableDelay) {
                     this.state.Lives -= 1;
                     this.lastStickCollisionTime = this.currentTime;
+		    let pos_orig = collisionEvent.target.position;
+		    collisionEvent.target.hasCollidedWithGround = true;
+                    collisionEvent.target.destructionTime = this.currentTime;
+		    for (let i = 0; i < 10; ++i) {
+			let pos = pos_orig.clone ();
+			pos.x += Math.random ();
+			pos.y += Math.random ();
+			pos.z += Math.random ();
+			const splashCube = new Cube (undefined, pos, 1);
+			this.add (splashCube);
+			this.world.addBody (splashCube.body);
+			this.generatedObjects.add (splashCube);
+			splashCube.body.hasCollidedWithGround = true;
+			splashCube.body.destructionTime = this.currentTime + this.destructionDelay;
+		    }
                 }
             }
 
