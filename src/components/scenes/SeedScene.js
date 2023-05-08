@@ -5,6 +5,7 @@ import { Stick } from 'objects';
 import { BasicLights } from 'lights';
 import Cube from '../objects/Cube/Cube';
 import Ground from '../objects/Ground/Ground';
+import Shard from '../objects/Shard/Shard';
 import Sphere from '../objects/Sphere/Sphere';
 import Rectangle from '../objects/Background/Rectangle';
 
@@ -25,7 +26,7 @@ class SeedScene extends Scene {
         }
         this.generateHeight = 15;
         this.lastGenerateTime = 0;
-        this.generateDelay = 500; // In ms.
+        this.generateDelay = 1000; // In ms.
         this.generatedObjects = new Set();
 
         // Collision timings
@@ -134,7 +135,7 @@ class SeedScene extends Scene {
                     this.lastStickCollisionTime = this.currentTime;
 		    let pos_orig = collisionEvent.target.position;
 		    collisionEvent.target.hasCollidedWithGround = true;
-                    collisionEvent.target.destructionTime = this.currentTime;
+            collisionEvent.target.destructionTime = this.currentTime;
 		    for (let i = 0; i < 10; ++i) {
 			let pos = pos_orig.clone ();
 			pos.x += Math.random ();
@@ -145,7 +146,7 @@ class SeedScene extends Scene {
 			this.world.addBody (splashCube.body);
 			this.generatedObjects.add (splashCube);
 			splashCube.body.hasCollidedWithGround = true;
-			splashCube.body.destructionTime = this.currentTime + this.destructionDelay;
+			splashCube.body.destructionTime = this.currentTime + this.destructionDelay / 2;
 		    }
                 }
             }
@@ -155,7 +156,62 @@ class SeedScene extends Scene {
                 if (!collisionEvent.target.hasCollidedWithGround) {
                     this.state.Score += 1;
                     collisionEvent.target.hasCollidedWithGround = true;
-                    collisionEvent.target.destructionTime = this.currentTime + this.destructionDelay;
+                    collisionEvent.target.destructionTime = this.currentTime;
+                    const pos = newCube.position;
+                    const verts = newCube.geometry.vertices;
+                    for (var i = 0; i < 6; i++) {
+                        const indices = [newCube.geometry.faces[2 * i].a, newCube.geometry.faces[2 * i].c, newCube.geometry.faces[2 * i + 1].a, newCube.geometry.faces[2 * i + 1].b];
+                        var r1 = Math.random();
+                        var r2 = Math.random();
+                        const newPoint = [];
+                        newPoint.push(r2 * (r1 * verts[indices[0]].x + (1 - r1) * verts[indices[1]].x) + (1 - r2) * (r1 * verts[indices[2]].x + (1 - r1) * verts[indices[3]].x));
+                        newPoint.push(r2 * (r1 * verts[indices[0]].y + (1 - r1) * verts[indices[1]].y) + (1 - r2) * (r1 * verts[indices[2]].y + (1 - r1) * verts[indices[3]].y));
+                        newPoint.push(r2 * (r1 * verts[indices[0]].z + (1 - r1) * verts[indices[1]].z) + (1 - r2) * (r1 * verts[indices[2]].z + (1 - r1) * verts[indices[3]].z));
+                        const index = [ 0, 1, 2,
+                                        0, 2, 3,
+                                        0, 3, 1,
+                                        1, 3, 2];
+                        const shard = new Shard(undefined, new Float32Array([0.0, 0.0, 0.0,
+                                                                            newPoint[0], newPoint[1], newPoint[2],
+                                                                            verts[indices[0]].x, verts[indices[0]].y, verts[indices[0]].z,
+                                                                            verts[indices[1]].x, verts[indices[1]].y, verts[indices[1]].z]), index, pos, newCube.body.velocity);
+                        const shard2 = new Shard(undefined, new Float32Array([0.0, 0.0, 0.0,
+                                                                            newPoint[0], newPoint[1], newPoint[2],
+                                                                            verts[indices[3]].x, verts[indices[3]].y, verts[indices[2]].z,
+                                                                            verts[indices[2]].x, verts[indices[2]].y, verts[indices[3]].z]), index, pos, newCube.body.velocity);
+
+                        const shard3 = new Shard(undefined, new Float32Array([0.0, 0.0, 0.0,
+                                                                            newPoint[0], newPoint[1], newPoint[2],
+                                                                            verts[indices[1]].x, verts[indices[1]].y, verts[indices[1]].z,
+                                                                            verts[indices[3]].x, verts[indices[3]].y, verts[indices[3]].z]), index, pos, newCube.body.velocity);
+                        const shard4 = new Shard(undefined, new Float32Array([0.0, 0.0, 0.0,
+                                                                            newPoint[0], newPoint[1], newPoint[2],
+                                                                            verts[indices[2]].x, verts[indices[2]].y, verts[indices[2]].z,
+                                                                            verts[indices[0]].x, verts[indices[0]].y, verts[indices[0]].z]), index, pos, newCube.body.velocity);
+                        this.add(shard);
+                        this.generatedObjects.add(shard);
+                        this.world.addBody(shard.body);
+                        shard.body.hasCollidedWithGround = true;
+			            shard.body.destructionTime = this.currentTime + this.destructionDelay;
+
+                        this.add(shard2);
+                        this.generatedObjects.add(shard2);
+                        this.world.addBody(shard2.body);
+                        shard2.body.hasCollidedWithGround = true;
+			            shard2.body.destructionTime = this.currentTime + this.destructionDelay;
+
+                        this.add(shard3);
+                        this.generatedObjects.add(shard3);
+                        this.world.addBody(shard3.body);
+                        shard3.body.hasCollidedWithGround = true;
+			            shard3.body.destructionTime = this.currentTime + this.destructionDelay2;
+
+                        this.add(shard4);
+                        this.generatedObjects.add(shard4);
+                        this.world.addBody(shard4.body);
+                        shard4.body.hasCollidedWithGround = true;
+			            shard4.body.destructionTime = this.currentTime + this.destructionDelay;
+                    }
                 }
             }
         });

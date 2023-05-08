@@ -51,7 +51,6 @@ class Stick extends Mesh {
     */
     updatePosition() {
         this.position.copy(this.body.position);
-        this.quaternion.copy(this.body.quaternion);
     }
 
     // update() { if (this.model != undefined) this.model.position.x = this.pos; }
