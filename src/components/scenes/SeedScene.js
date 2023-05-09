@@ -1,5 +1,5 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, Vector3, MeshPhongMaterial, PlaneGeometry, Mesh, Fog, PolyhedronGeometry } from 'three';
+import { Scene, Color, Vector3, MeshPhongMaterial, PlaneGeometry, Mesh, Fog, PolyhedronGeometry, SpotLight } from 'three';
 import * as CANNON from 'cannon-es';
 import { Stick } from 'objects';
 import { BasicLights } from 'lights';
@@ -85,6 +85,12 @@ class SeedScene extends Scene {
         // Add objects to scene
         const lights = new BasicLights();
         this.add(lights);
+
+        // spot light
+        const moonlight = new SpotLight(0xffffff, 4, 10, 1, 0.3, 0);
+        moonlight.position.set(0, 10, 3);
+        moonlight.target.position.set(0,0,3);
+        this.add(moonlight);
 
         // Add stick figure
         this.stick = new Stick(stickMaterial);
