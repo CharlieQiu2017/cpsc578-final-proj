@@ -129,51 +129,53 @@ class SeedScene extends Scene {
 
     // Generate random falling object
     generateObj() {
-        const newCube = new Cube(undefined, new Vector3(
-            Math.random() * (this.playableArea.maxX - this.playableArea.minX) + this.playableArea.minX,
-            this.generateHeight,
-            Math.random() * (this.playableArea.maxZ - this.playableArea.minZ) + this.playableArea.minZ
-        ), 3 + Math.random(), Math.random() * 20, Math.random() * 30);
+        for(var i = 0; i < 2; i++) {
+            const newCube = new Cube(undefined, new Vector3(
+                Math.random() * (this.playableArea.maxX - this.playableArea.minX) + this.playableArea.minX,
+                this.generateHeight,
+                Math.random() * (this.playableArea.maxZ - this.playableArea.minZ) + this.playableArea.minZ
+            ), 3 + Math.random(), Math.random() * 20, Math.random() * 30);
 
-        // Add some extra properties for the object
-        newCube.body.hasCollidedWithGround = false;
-        newCube.body.destructionTime = undefined;
-        newCube.body.meshReference = newCube; // Reference to the cube mesh
+            // Add some extra properties for the object
+            newCube.body.hasCollidedWithGround = false;
+            newCube.body.destructionTime = undefined;
+            newCube.body.meshReference = newCube; // Reference to the cube mesh
 
-        // Attach collision event listener
-        newCube.body.addEventListener("collide", (collisionEvent) => {
-            // If collision is with player
-            if (collisionEvent.body === this.stick.body) {
-                if (this.currentTime - this.lastStickCollisionTime >= this.invulnerableDelay) {
-                    this.state.Lives -= 1;
-                    this.lastStickCollisionTime = this.currentTime;
+            // Attach collision event listener
+            newCube.body.addEventListener("collide", (collisionEvent) => {
+                // If collision is with player
+                if (collisionEvent.body === this.stick.body) {
+                    if (this.currentTime - this.lastStickCollisionTime >= this.invulnerableDelay) {
+                        this.state.Lives -= 1;
+                        this.lastStickCollisionTime = this.currentTime;
 
-                    if (this.state.ShatterAnimation)
-                        this.shatterCube(collisionEvent.target.meshReference);
-                    else this.explodeCube(collisionEvent.target.meshReference);
+                        if (this.state.ShatterAnimation)
+                            this.shatterCube(collisionEvent.target.meshReference);
+                        else this.explodeCube(collisionEvent.target.meshReference);
+                    }
                 }
-            }
 
-            // If collision is with ground
-            if (collisionEvent.body === this.ground.body) {
-                if (!collisionEvent.target.hasCollidedWithGround) {
-                    this.state.Score += 1;
-                    collisionEvent.target.hasCollidedWithGround = true;
-                    collisionEvent.target.destructionTime = this.currentTime;
+                // If collision is with ground
+                if (collisionEvent.body === this.ground.body) {
+                    if (!collisionEvent.target.hasCollidedWithGround) {
+                        this.state.Score += 1;
+                        collisionEvent.target.hasCollidedWithGround = true;
+                        collisionEvent.target.destructionTime = this.currentTime;
 
-                    if (this.state.ShatterAnimation)
-                        this.shatterCube(collisionEvent.target.meshReference);
-                    else this.explodeCube(collisionEvent.target.meshReference);
+                        if (this.state.ShatterAnimation)
+                            this.shatterCube(collisionEvent.target.meshReference);
+                        else this.explodeCube(collisionEvent.target.meshReference);
+                    }
                 }
-            }
-        });
+            });
 
-        // Add to scene and physics world
-        this.add(newCube);
-        this.world.addBody(newCube.body);
+            // Add to scene and physics world
+            this.add(newCube);
+            this.world.addBody(newCube.body);
 
-        // Remember the new object
-        this.generatedObjects.add(newCube);
+            // Remember the new object
+            this.generatedObjects.add(newCube);
+        }
     }
 
     // Explode the cube into multiple smaller cubes
