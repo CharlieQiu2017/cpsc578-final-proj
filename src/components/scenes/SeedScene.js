@@ -1,5 +1,6 @@
 import * as Dat from 'dat.gui';
 import { Scene, Color, Vector3, MeshPhongMaterial, PlaneGeometry, Mesh, Fog, PolyhedronGeometry, SpotLight, GridHelper } from 'three';
+import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { Stick } from 'objects';
 import { BasicLights } from 'lights';
@@ -9,7 +10,7 @@ import Shard from '../objects/Shard/Shard';
 import Sphere from '../objects/Sphere/Sphere';
 import Rectangle from '../objects/Background/Rectangle';
 import Plane from '../objects/Plane/Plane';
-import Building from '../objects/Building/Building';
+// import createBuilding from '../objects/Building/Building';
 
 
 class SeedScene extends Scene {
@@ -91,6 +92,7 @@ class SeedScene extends Scene {
         const moonlight = new SpotLight(0xffffff, 4, 10, 1, 0.3, 0);
         moonlight.position.set(0, 10, 3);
         moonlight.target.position.set(0,0,3);
+        
         this.add(moonlight);
 
         // Add stick figure
@@ -132,17 +134,16 @@ class SeedScene extends Scene {
         this.add(this.background);
 
         // Add buildings
-        this.building = new Building(7, 21, new Vector3(35, 0, -10));
-        this.gridHelper = new GridHelper(7, 7, 0x04D9FF, 0x04D9FF);
-        // this.gridHelper.visible = false;
-        // this.gridHelper.material.linewidth = 6;
-        this.gridHelper.rotateX(-Math.PI / 2);
-        this.gridHelper.position.x=35;
-        this.gridHelper.position.y=0;
-        this.gridHelper.position.z=-10;
-        this.add(this.building);
-        this.add(this.gridHelper);
-
+        this.building1 = new createBuilding(7, 14, new Vector3(35, -7, -10));
+        this.add(this.building1);
+        this.building2 = new createBuilding(7, 9, new Vector3(27, -7, -10));
+        this.add(this.building2);
+        this.building3 = new createBuilding(7, 6, new Vector3(-47, -7, -10));
+        this.add(this.building3);
+        this.building4 = new createBuilding(7, 15, new Vector3(-39, -7, -10));
+        this.add(this.building4);
+        this.building5 = new createBuilding(5, 10, new Vector3(-25, -7, -10));
+        this.add(this.building5);
         // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
     }
 
@@ -351,6 +352,55 @@ class SeedScene extends Scene {
             this.stick.body.velocity.z += movementInc
         }
     }
+}
+
+function createBuilding(width = 7, height = 20, pos = new THREE.Vector3(0, 0, 0)) {
+    const building = new THREE.Group();
+
+    // Cube material and geometry
+    const phongMaterialDarkBlue = new THREE.MeshBasicMaterial({
+        color: 0x000015,
+        flatShading: true,
+        transparent: true,
+        opacity: 0.5
+    });
+
+    for(var i = 0; i < width; i++) {
+        for(var j = 0; j < height; j++) {
+            let color;
+            if (i % 2 == 0 && j % 2 == 0) {
+                color = new THREE.MeshPhongMaterial({
+                    color: 0x16DBFF,
+                    flatShading: true,
+                    shininess: 150,
+                    transparent: true,
+                    opacity: Math.random()
+                });
+            } else {
+                color = new THREE.MeshBasicMaterial({
+                    color: 0x000015,
+                    flatShading: true,
+                    transparent: true,
+                    opacity: Math.random() * 0.3
+                });
+            }
+
+            const rectangle = new THREE.Mesh(
+                new THREE.PlaneGeometry(1,2),
+                color
+            )
+            
+            rectangle.position.x = i;
+            rectangle.position.y = j*2;
+
+            building.add(rectangle);
+        }
+    }
+    building.position.x = pos.x;
+    building.position.y = pos.y;
+    building.position.z = pos.z;
+
+    return building;
 }
 
 export default SeedScene;
