@@ -31,7 +31,7 @@ class SeedScene extends Scene {
         this.generatedObjects = new Set();
 
         // Collision timings
-        this.destructionDelay = 1000; // How long before object disappears after hitting ground
+        this.destructionDelay = 1500; // How long before object disappears after hitting ground
         this.invulnerableDelay = 500; // How long the player remains invulnerable
                                         // after being hit with an object
         this.lastStickCollisionTime = 0;
@@ -47,6 +47,7 @@ class SeedScene extends Scene {
             upPressed: false,
             downPressed: false,
             isPaused: true,
+            ShatterAnimation: false,
             Score: 0,
             Lives: this.defaultLives
         };
@@ -60,6 +61,7 @@ class SeedScene extends Scene {
         };
         const menu = this.state.gui.addFolder("Menu");
         buttons.forEach((button) => menu.add(apiMenu, button));
+        menu.add(this.state, "ShatterAnimation");
         menu.open();
         this.state.gui.add(this.state, 'Score');
         this.state.gui.add(this.state, 'Lives');
@@ -146,21 +148,9 @@ class SeedScene extends Scene {
                     this.state.Lives -= 1;
                     this.lastStickCollisionTime = this.currentTime;
 
-                    let pos_orig = collisionEvent.target.position;
-                    collisionEvent.target.hasCollidedWithGround = true;
-                    collisionEvent.target.destructionTime = this.currentTime;
-                    for (let i = 0; i < 10; ++i) {
-                        let pos = pos_orig.clone ();
-                        pos.x += Math.random ();
-                        pos.y += Math.random ();
-                        pos.z += Math.random ();
-                        const splashCube = new Cube (undefined, pos, 1);
-                        this.add (splashCube);
-                        this.world.addBody (splashCube.body);
-                        this.generatedObjects.add (splashCube);
-                        splashCube.body.hasCollidedWithGround = true;
-                        splashCube.body.destructionTime = this.currentTime + this.destructionDelay / 2;
-                    }
+                    if (this.state.ShatterAnimation)
+                        this.shatterCube(collisionEvent.target.meshReference);
+                    else this.explodeCube(collisionEvent.target.meshReference);
                 }
             }
 
@@ -171,34 +161,9 @@ class SeedScene extends Scene {
                     collisionEvent.target.hasCollidedWithGround = true;
                     collisionEvent.target.destructionTime = this.currentTime;
 
-                    // Position and vertices of cube
-                    const pos = collisionEvent.target.meshReference.position;
-                    const verts = collisionEvent.target.meshReference.geometry.vertices;
-
-                    // Generate a shard for each triangular face of the cube
-                    collisionEvent.target.meshReference.geometry.faces.forEach((face) => {
-
-                        // Get vertices
-                        const shardVerts = [pos,
-                            (new Vector3()).addVectors(verts[face.a], pos),
-                            (new Vector3()).addVectors(verts[face.b], pos),
-                            (new Vector3()).addVectors(verts[face.c], pos)];
-
-                        // Get faces
-                        const shardFaces = [
-                            [1, 2, 3],
-                            [1, 0, 2],
-                            [2, 0, 3],
-                            [3, 0, 1]];
-
-                        // Initialize shard
-                        const shard = new Shard(undefined, shardVerts, shardFaces, face.normal);
-                        this.add(shard);
-                        this.world.addBody(shard.body);
-                        this.generatedObjects.add(shard);
-                        shard.body.hasCollidedWithGround = true;
-			            shard.body.destructionTime = this.currentTime + this.destructionDelay;
-                    })
+                    if (this.state.ShatterAnimation)
+                        this.shatterCube(collisionEvent.target.meshReference);
+                    else this.explodeCube(collisionEvent.target.meshReference);
                 }
             }
         });
@@ -209,6 +174,67 @@ class SeedScene extends Scene {
 
         // Remember the new object
         this.generatedObjects.add(newCube);
+    }
+
+    // Explode the cube into multiple smaller cubes
+    explodeCube(cube) {
+
+        // Destroy cube
+        cube.body.hasCollidedWithGround = true;
+        cube.body.destructionTime = this.currentTime;
+
+        // Generate 10 smaller cubes
+        for (let i = 0; i < 10; ++i) {
+
+            // Assign random position for smaller cube
+            let pos = cube.body.position.clone();
+            pos.x += Math.random();
+            pos.y += Math.random();
+            pos.z += Math.random();
+
+            // Initialize small cube
+            const splashCube = new Cube(undefined, pos, 1);
+            this.add(splashCube);
+            this.world.addBody(splashCube.body);
+            this.generatedObjects.add(splashCube);
+
+            // Set timer for destruction
+            splashCube.body.hasCollidedWithGround = true;
+            splashCube.body.destructionTime = this.currentTime + this.destructionDelay;
+        }
+    }
+
+    // Break cube into more realistic looking shards
+    shatterCube(cube) {
+        
+        // Position and vertices of cube
+        const pos = cube.position;
+        const verts = cube.geometry.vertices;
+
+        // Get face indices, same for all shards
+        const shardFaces = [
+            [1, 2, 3],
+            [1, 0, 2],
+            [2, 0, 3],
+            [3, 0, 1]];
+
+        // Generate a shard for each triangular face of the cube
+        cube.geometry.faces.forEach((face) => {
+
+            // Get vertices
+            const shardVerts = [pos,
+                (new Vector3()).addVectors(verts[face.a], pos),
+                (new Vector3()).addVectors(verts[face.b], pos),
+                (new Vector3()).addVectors(verts[face.c], pos)];
+
+            // Initialize shard
+            const shard = new Shard(undefined, shardVerts, shardFaces, face.normal);
+            this.add(shard);
+            this.world.addBody(shard.body);
+            this.generatedObjects.add(shard);
+            shard.body.hasCollidedWithGround = true;
+            shard.body.destructionTime = this.currentTime + this.destructionDelay;
+        })
     }
 
     checkAndDestroyObj() {
