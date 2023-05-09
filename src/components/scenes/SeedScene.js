@@ -1,5 +1,5 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color, Vector3, MeshPhongMaterial, PlaneGeometry, Mesh, Fog, PolyhedronGeometry, SpotLight } from 'three';
+import { Scene, Color, Vector3, MeshPhongMaterial, PlaneGeometry, Mesh, Fog, PolyhedronGeometry, SpotLight, GridHelper } from 'three';
 import * as CANNON from 'cannon-es';
 import { Stick } from 'objects';
 import { BasicLights } from 'lights';
@@ -9,6 +9,7 @@ import Shard from '../objects/Shard/Shard';
 import Sphere from '../objects/Sphere/Sphere';
 import Rectangle from '../objects/Background/Rectangle';
 import Plane from '../objects/Plane/Plane';
+import Building from '../objects/Building/Building';
 
 
 class SeedScene extends Scene {
@@ -129,6 +130,18 @@ class SeedScene extends Scene {
         // Add background
         this.background = new Rectangle();
         this.add(this.background);
+
+        // Add buildings
+        this.building = new Building(7, 21, new Vector3(35, 0, -10));
+        this.gridHelper = new GridHelper(7, 7, 0x04D9FF, 0x04D9FF);
+        // this.gridHelper.visible = false;
+        // this.gridHelper.material.linewidth = 6;
+        this.gridHelper.rotateX(-Math.PI / 2);
+        this.gridHelper.position.x=35;
+        this.gridHelper.position.y=0;
+        this.gridHelper.position.z=-10;
+        this.add(this.building);
+        this.add(this.gridHelper);
 
         // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
     }
