@@ -25,13 +25,17 @@ class SeedScene extends Scene {
             minZ: -20,
             maxZ: 20, 
         }
+        this.cubeSizes = {
+            min: 2,
+            max: 10
+        }
         this.generateHeight = 15;
         this.lastGenerateTime = 0;
-        this.generateDelay = 1000; // In ms.
+        this.generateDelay = 5000; // In ms.
         this.generatedObjects = new Set();
 
         // Collision timings
-        this.destructionDelay = 1500; // How long before object disappears after hitting ground
+        this.destructionDelay = 2000; // How long before object disappears after hitting ground
         this.invulnerableDelay = 500; // How long the player remains invulnerable
                                         // after being hit with an object
         this.lastStickCollisionTime = 0;
@@ -129,11 +133,14 @@ class SeedScene extends Scene {
 
     // Generate random falling object
     generateObj() {
-        const newCube = new Cube(undefined, new Vector3(
-            Math.random() * (this.playableArea.maxX - this.playableArea.minX) + this.playableArea.minX,
-            this.generateHeight,
-            Math.random() * (this.playableArea.maxZ - this.playableArea.minZ) + this.playableArea.minZ
-        ), 3 + Math.random(), Math.random() * 20, Math.random() * 30);
+        const size = this.cubeSizes.min + (this.cubeSizes.max - this.cubeSizes.min) * Math.random();
+        const cubeX =
+            Math.random() * (this.playableArea.maxX - this.playableArea.minX - size) + this.playableArea.minX + size;
+        const cubeZ =
+            Math.random() * (this.playableArea.maxZ - this.playableArea.minZ - size) + this.playableArea.minZ + size;
+        const newCube = new Cube(this.stickMaterial, new Vector3(cubeX, this.generateHeight, cubeZ),
+                                this.cubeSizes.min + (this.cubeSizes.max - this.cubeSizes.min) * Math.random(),
+                                1, Math.random() * 30);
 
         // Add some extra properties for the object
         newCube.body.hasCollidedWithGround = false;
@@ -145,7 +152,7 @@ class SeedScene extends Scene {
             // If collision is with player
             if (collisionEvent.body === this.stick.body) {
                 if (this.currentTime - this.lastStickCollisionTime >= this.invulnerableDelay) {
-                    this.state.Lives -= 1;
+                    this.state.Score += 1;
                     this.lastStickCollisionTime = this.currentTime;
 
                     if (this.state.ShatterAnimation)
@@ -157,7 +164,7 @@ class SeedScene extends Scene {
             // If collision is with ground
             if (collisionEvent.body === this.ground.body) {
                 if (!collisionEvent.target.hasCollidedWithGround) {
-                    this.state.Score += 1;
+                    this.state.Lives -= 1;
                     collisionEvent.target.hasCollidedWithGround = true;
                     collisionEvent.target.destructionTime = this.currentTime;
 
@@ -206,7 +213,7 @@ class SeedScene extends Scene {
 
     // Break cube into more realistic looking shards
     shatterCube(cube) {
-        
+
         // Position and vertices of cube
         const pos = cube.position;
         const verts = cube.geometry.vertices;
