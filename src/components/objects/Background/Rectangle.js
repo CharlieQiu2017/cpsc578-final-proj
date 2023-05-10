@@ -13,7 +13,7 @@ class Rectangle extends THREE.Mesh {
         rectangleGeometry.mergeVertices();
 
         var randomFloorVertexPos;
-
+        //https://stackoverflow.com/questions/49383791/low-poly-terrain-created-by-modifying-geometry-vertices-is-producing-black-glitc,
         rectangleGeometry.vertices.forEach(function(floorVertex){
             randomFloorVertexPos = Math.floor(Math.random() * ((0) - 
             (-90)) + (-90));
