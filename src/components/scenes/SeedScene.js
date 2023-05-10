@@ -315,7 +315,7 @@ class SeedScene extends Scene {
         // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
 
         this.currentTime = timeStamp;
-        this.generateDelay = Math.max(3000 - 0.06 * this.currentTime, 1000);
+        this.generateDelay = Math.max(5000 - 0.06 * this.currentTime, 1000);
 
         // Update GUI
         for (var i in this.state.gui.__controllers) {
@@ -346,7 +346,7 @@ class SeedScene extends Scene {
         this.clouds.update();
 
         // Move stick figure
-        const movementInc = 0.5;
+        const movementInc = 1;
 
         // Left and right movement
         if (this.state.leftPressed) {
