@@ -7,7 +7,7 @@ import { BasicLights } from 'lights';
 import Cube from '../objects/Cube/Cube';
 import Ground from '../objects/Ground/Ground';
 import Shard from '../objects/Shard/Shard';
-import Sphere from '../objects/Sphere/Sphere';
+import Clouds from '../objects/Clouds/Clouds';
 import Rectangle from '../objects/Background/Rectangle';
 import Plane from '../objects/Plane/Plane';
 // import createBuilding from '../objects/Building/Building';
@@ -88,6 +88,10 @@ class SeedScene extends Scene {
         this.stick = new Stick(stickMaterial);
         this.add(this.stick);
         this.world.addBody(this.stick.body);
+
+        // Add clouds
+        this.clouds = new Clouds(10);
+        this.add(this.clouds);
 
         // Add plane under ground
         this.underground = new Plane();
@@ -311,6 +315,7 @@ class SeedScene extends Scene {
         // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
 
         this.currentTime = timeStamp;
+        this.generateDelay = Math.max(3000 - 0.06 * this.currentTime, 1000);
 
         // Update GUI
         for (var i in this.state.gui.__controllers) {
@@ -336,6 +341,9 @@ class SeedScene extends Scene {
 
         // Destroy any object that needs to be
         this.checkAndDestroyObj();
+
+        // Move clouds
+        this.clouds.update();
 
         // Move stick figure
         const movementInc = 0.5;
