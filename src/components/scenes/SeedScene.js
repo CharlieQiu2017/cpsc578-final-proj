@@ -58,20 +58,6 @@ class SeedScene extends Scene {
             Lives: this.defaultLives
         };
 
-        // Configure GUI
-        const buttons = ["Start", "Pause", "Reset"];
-        const apiMenu = {
-            Start: () => {this.state.isPaused = false;},
-            Pause: () => {this.state.isPaused = true;},
-            Reset: () => {this.resetScene()}
-        };
-        const menu = this.state.gui.addFolder("Menu");
-        buttons.forEach((button) => menu.add(apiMenu, button));
-        menu.add(this.state, "ShatterAnimation");
-        menu.open();
-        this.state.gui.add(this.state, 'Score');
-        this.state.gui.add(this.state, 'Lives');
-
         // Set background to a nice color
         this.background = new Color(0x7ec0ee); //sky = 0x87CEEB
 
@@ -93,11 +79,10 @@ class SeedScene extends Scene {
         this.add(lights);
 
         // spot light
-        const moonlight = new SpotLight(0xffffff, 4, 10, 1, 0.3, 0);
-        moonlight.position.set(0, 10, 3);
-        moonlight.target.position.set(0,0,3);
-        
-        this.add(moonlight);
+        // const moonlight = new SpotLight(0xffffff, 4, 10, 1, 0.3, 0);
+        // moonlight.position.set(0, 20, 3);
+        // moonlight.target.position.set(0,0,3);
+        // this.add(moonlight);
 
         // Add stick figure
         this.stick = new Stick(stickMaterial);
@@ -152,7 +137,27 @@ class SeedScene extends Scene {
         this.add(this.building6);
         this.building7 = new createBuilding(8, 10, new Vector3(-54, -7, -10));
         this.add(this.building7);
-        // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
+
+        // Configure GUI
+        this.groundTexture = true;
+        const buttons = ["Start", "Pause", "Reset", "ToggleGroundTexture"];
+        const apiMenu = {
+            Start: () => {this.state.isPaused = false;},
+            Pause: () => {this.state.isPaused = true;},
+            Reset: () => {this.resetScene()},
+            ToggleGroundTexture: () => {
+                this.groundTexture = !this.groundTexture;
+                this.remove(this.underground);
+                this.underground = new Plane(this.groundTexture);
+                this.add(this.underground);
+            }
+        };
+        const menu = this.state.gui.addFolder("Menu");
+        buttons.forEach((button) => menu.add(apiMenu, button));
+        menu.add(this.state, "ShatterAnimation");
+        menu.open();
+        this.state.gui.add(this.state, 'Score');
+        this.state.gui.add(this.state, 'Lives');
     }
 
     // Generate random falling object
