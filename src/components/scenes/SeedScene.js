@@ -173,7 +173,7 @@ class SeedScene extends Scene {
             Math.random() * (this.playableArea.maxZ - this.playableArea.minZ - size) + this.playableArea.minZ + size;
         const newCube = new Cube(this.stickMaterial, new Vector3(cubeX, this.generateHeight, cubeZ),
                                 this.cubeSizes.min + (this.cubeSizes.max - this.cubeSizes.min) * Math.random(),
-                                1, Math.random() * 30);
+                                1, 10 + Math.random() * 5);
 
         // Add some extra properties for the object
         newCube.body.hasCollidedWithGround = false;
