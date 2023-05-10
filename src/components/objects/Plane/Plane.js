@@ -3,7 +3,7 @@ import * as CANNON from 'cannon-es';
 import texture from './rockysoil.jpg';
 
 class Plane extends THREE.Mesh {
-    constructor(width = 140, height = 70, color = 0x1B1915/*0x060F01*/) {
+    constructor(useTexture = true, width = 140, height = 70, color = 0x1B1915) {
 
         // Sphere material and geometry
         const planeGeometry = new THREE.PlaneGeometry(width, height);
@@ -19,9 +19,9 @@ class Plane extends THREE.Mesh {
 
         const phongMaterial = new THREE.MeshPhongMaterial({
             color: color, //soil: https://www.color-hex.com/color-palette/15769
-            flatShading: true,
-            map: meshTexture
+            flatShading: true
         });
+        if (useTexture) phongMaterial.map = meshTexture;
         // Call parent Mesh() constructor
         super(planeGeometry, phongMaterial);
 
@@ -37,7 +37,7 @@ class Plane extends THREE.Mesh {
         // Default position and orientation for the plane
         this.rotateX(-Math.PI / 2);
         this.position.x = 0;
-        this.position.y = -12;
+        this.position.y = -10;
 
         // Show shadows cast onto ground
         this.receiveShadow = true;

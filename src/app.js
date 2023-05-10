@@ -18,7 +18,7 @@ renderer.shadowMap.enabled = true;
 
 // Set up camera
 // camera.position.set(0, 30, 50);
-camera.position.set(0, 4, 50);
+camera.position.set(0, 20, 80);
 camera.lookAt(new Vector3(0, 0, 0));
 
 // Set up renderer, canvas, and minor CSS adjustments
@@ -31,6 +31,7 @@ document.body.appendChild(canvas);
 
 // Set up controls
 const controls = new OrbitControls(camera, canvas);
+controls.enabled = false;
 controls.enableDamping = true;
 controls.enablePan = false;
 controls.minDistance = 4;

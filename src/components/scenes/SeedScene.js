@@ -27,13 +27,17 @@ class SeedScene extends Scene {
             minZ: -20,
             maxZ: 20, 
         }
+        this.cubeSizes = {
+            min: 2,
+            max: 10
+        }
         this.generateHeight = 15;
         this.lastGenerateTime = 0;
-        this.generateDelay = 3000; // In ms.
+        this.generateDelay = 5000; // In ms.
         this.generatedObjects = new Set();
 
         // Collision timings
-        this.destructionDelay = 1500; // How long before object disappears after hitting ground
+        this.destructionDelay = 2000; // How long before object disappears after hitting ground
         this.invulnerableDelay = 500; // How long the player remains invulnerable
                                         // after being hit with an object
         this.lastStickCollisionTime = 0;
@@ -53,20 +57,6 @@ class SeedScene extends Scene {
             Score: 0,
             Lives: this.defaultLives
         };
-
-        // Configure GUI
-        const buttons = ["Start", "Pause", "Reset"];
-        const apiMenu = {
-            Start: () => {this.state.isPaused = false;},
-            Pause: () => {this.state.isPaused = true;},
-            Reset: () => {this.resetScene()}
-        };
-        const menu = this.state.gui.addFolder("Menu");
-        buttons.forEach((button) => menu.add(apiMenu, button));
-        menu.add(this.state, "ShatterAnimation");
-        menu.open();
-        this.state.gui.add(this.state, 'Score');
-        this.state.gui.add(this.state, 'Lives');
 
         // Set background to a nice color
         this.background = new Color(0x7ec0ee); //sky = 0x87CEEB
@@ -89,11 +79,10 @@ class SeedScene extends Scene {
         this.add(lights);
 
         // spot light
-        const moonlight = new SpotLight(0xffffff, 4, 10, 1, 0.3, 0);
-        moonlight.position.set(0, 10, 3);
-        moonlight.target.position.set(0,0,3);
-        
-        this.add(moonlight);
+        // const moonlight = new SpotLight(0xffffff, 4, 10, 1, 0.3, 0);
+        // moonlight.position.set(0, 20, 3);
+        // moonlight.target.position.set(0,0,3);
+        // this.add(moonlight);
 
         // Add stick figure
         this.stick = new Stick(stickMaterial);
@@ -152,59 +141,79 @@ class SeedScene extends Scene {
         this.add(this.building6);
         this.building7 = new createBuilding(8, 10, new Vector3(-54, -7, -10));
         this.add(this.building7);
-        // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
+
+        // Configure GUI
+        this.groundTexture = true;
+        const buttons = ["Start", "Pause", "Reset", "ToggleGroundTexture"];
+        const apiMenu = {
+            Start: () => {this.state.isPaused = false;},
+            Pause: () => {this.state.isPaused = true;},
+            Reset: () => {this.resetScene()},
+            ToggleGroundTexture: () => {
+                this.groundTexture = !this.groundTexture;
+                this.remove(this.underground);
+                this.underground = new Plane(this.groundTexture);
+                this.add(this.underground);
+            }
+        };
+        const menu = this.state.gui.addFolder("Menu");
+        buttons.forEach((button) => menu.add(apiMenu, button));
+        menu.add(this.state, "ShatterAnimation");
+        menu.open();
+        this.state.gui.add(this.state, 'Score');
+        this.state.gui.add(this.state, 'Lives');
     }
 
     // Generate random falling object
     generateObj() {
-        for(var i = 0; i < 2; i++) {
-            const newCube = new Cube(undefined, new Vector3(
-                Math.random() * (this.playableArea.maxX - this.playableArea.minX) + this.playableArea.minX,
-                this.generateHeight,
-                Math.random() * (this.playableArea.maxZ - this.playableArea.minZ) + this.playableArea.minZ
-            ), 3 + Math.random(), Math.random() * 20, Math.random() * 30);
+        const size = this.cubeSizes.min + (this.cubeSizes.max - this.cubeSizes.min) * Math.random();
+        const cubeX =
+            Math.random() * (this.playableArea.maxX - this.playableArea.minX - size) + this.playableArea.minX + size;
+        const cubeZ =
+            Math.random() * (this.playableArea.maxZ - this.playableArea.minZ - size) + this.playableArea.minZ + size;
+        const newCube = new Cube(this.stickMaterial, new Vector3(cubeX, this.generateHeight, cubeZ),
+                                this.cubeSizes.min + (this.cubeSizes.max - this.cubeSizes.min) * Math.random(),
+                                1, 10 + Math.random() * 5);
 
-            // Add some extra properties for the object
-            newCube.body.hasCollidedWithGround = false;
-            newCube.body.destructionTime = undefined;
-            newCube.body.meshReference = newCube; // Reference to the cube mesh
+        // Add some extra properties for the object
+        newCube.body.hasCollidedWithGround = false;
+        newCube.body.destructionTime = undefined;
+        newCube.body.meshReference = newCube; // Reference to the cube mesh
 
-            // Attach collision event listener
-            newCube.body.addEventListener("collide", (collisionEvent) => {
-                // If collision is with player
-                if (collisionEvent.body === this.stick.body) {
-                    if (this.currentTime - this.lastStickCollisionTime >= this.invulnerableDelay) {
-                        this.state.Lives -= 1;
-                        this.lastStickCollisionTime = this.currentTime;
+        // Attach collision event listener
+        newCube.body.addEventListener("collide", (collisionEvent) => {
+            // If collision is with player
+            if (collisionEvent.body === this.stick.body) {
+                if (this.currentTime - this.lastStickCollisionTime >= this.invulnerableDelay) {
+                    this.state.Score += 1;
+                    this.lastStickCollisionTime = this.currentTime;
 
-                        // if (this.state.ShatterAnimation)
-                        //     this.shatterCube(collisionEvent.target.meshReference);
-                        // else this.explodeCube(collisionEvent.target.meshReference);
-                        this.explodeCube(collisionEvent.target.meshReference);
-                    }
+                    if (this.state.ShatterAnimation)
+                        this.shatterCube(collisionEvent.target.meshReference);
+                    else this.explodeCube(collisionEvent.target.meshReference);
                 }
+            }
 
-                // If collision is with ground
-                if (collisionEvent.body === this.ground.body) {
-                    if (!collisionEvent.target.hasCollidedWithGround) {
-                        this.state.Score += 1;
-                        collisionEvent.target.hasCollidedWithGround = true;
-                        collisionEvent.target.destructionTime = this.currentTime;
+            // If collision is with ground
+            if (collisionEvent.body === this.ground.body) {
+                if (!collisionEvent.target.hasCollidedWithGround) {
+                    this.state.Lives -= 1;
+                    collisionEvent.target.hasCollidedWithGround = true;
+                    collisionEvent.target.destructionTime = this.currentTime;
 
-                        if (this.state.ShatterAnimation)
-                            this.shatterCube(collisionEvent.target.meshReference);
-                        else this.explodeCube(collisionEvent.target.meshReference);
-                    }
+                    if (this.state.ShatterAnimation)
+                        this.shatterCube(collisionEvent.target.meshReference);
+                    else this.explodeCube(collisionEvent.target.meshReference);
                 }
-            });
+            }
+        });
 
-            // Add to scene and physics world
-            this.add(newCube);
-            this.world.addBody(newCube.body);
+        // Add to scene and physics world
+        this.add(newCube);
+        this.world.addBody(newCube.body);
 
-            // Remember the new object
-            this.generatedObjects.add(newCube);
-        }
+        // Remember the new object
+        this.generatedObjects.add(newCube);
     }
 
     // Explode the cube into multiple smaller cubes
@@ -237,7 +246,7 @@ class SeedScene extends Scene {
 
     // Break cube into more realistic looking shards
     shatterCube(cube) {
-        
+
         // Position and vertices of cube
         const pos = cube.position;
         const verts = cube.geometry.vertices;
@@ -306,7 +315,7 @@ class SeedScene extends Scene {
         // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
 
         this.currentTime = timeStamp;
-        this.generateDelay = Math.max(3000 - 0.06 * this.currentTime, 1000);
+        this.generateDelay = Math.max(5000 - 0.06 * this.currentTime, 1000);
 
         // Update GUI
         for (var i in this.state.gui.__controllers) {
@@ -337,7 +346,7 @@ class SeedScene extends Scene {
         this.clouds.update();
 
         // Move stick figure
-        const movementInc = 0.5;
+        const movementInc = 1;
 
         // Left and right movement
         if (this.state.leftPressed) {
