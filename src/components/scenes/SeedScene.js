@@ -144,6 +144,10 @@ class SeedScene extends Scene {
         this.add(this.building4);
         this.building5 = new createBuilding(5, 10, new Vector3(-25, -7, -10));
         this.add(this.building5);
+        this.building6 = new createBuilding(8, 10, new Vector3(45, -7, -10));
+        this.add(this.building6);
+        this.building7 = new createBuilding(8, 10, new Vector3(-54, -7, -10));
+        this.add(this.building7);
         // this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
     }
 

@@ -9,7 +9,7 @@ class Rectangle extends THREE.Mesh {
             color: 0xB7410E, //0xC08955,
             flatShading: true,
         });
-        const rectangleGeometry = new THREE.BoxGeometry(200, 80, 10, 20, 10, 5);
+        const rectangleGeometry = new THREE.BoxGeometry(250, 80, 10, 20, 10, 5);
         rectangleGeometry.mergeVertices();
 
         var randomFloorVertexPos;
