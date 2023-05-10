@@ -17,6 +17,7 @@ class Stick extends Mesh {
         this.name = 'stick';
         this.pos = 0.0;
         this.model = undefined;
+        this.castShadow = true;
 
         loader.load(MODEL, (gltf) => {
             this.model = gltf.scene.children[0];
